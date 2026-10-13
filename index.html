@@ -1,0 +1,514 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Randevu">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#4f7c82">
+<title>Randevu Defteri</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%234f7c82'/%3E%3Ctext x='90' y='120' font-size='100' text-anchor='middle' fill='white'%3E%F0%9F%93%85%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4f6f6; --card:#fff; --ink:#1f2d2f; --muted:#6b7b7d; --line:#e1e8e8;
+  --accent:#4f7c82; --accent-d:#3b6066; --accent-l:#e3eff0; --danger:#c0473f; --warn:#f3b44f;
+  --slot:#fafcfc;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121819;--card:#1b2325;--ink:#e8eff0;--muted:#8fa2a5;--line:#2a3639;--accent:#6aa5ac;--accent-d:#86bcc2;--accent-l:#22393c;--slot:#182022;--danger:#e0685f}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;font-size:16px}
+body{min-height:100dvh;padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
+.nav{display:flex;align-items:center;gap:8px}
+.nav .title{flex:1;text-align:center;line-height:1.2}
+.nav .title b{display:block;font-size:17px}
+.nav .title small{color:var(--muted)}
+button{font:inherit;border:0;cursor:pointer;color:inherit}
+.ib{width:44px;height:44px;border-radius:12px;background:var(--accent-l);color:var(--accent-d);font-size:22px;font-weight:600}
+.ib:active{transform:scale(.96)}
+.sub{display:flex;gap:8px;margin-top:8px}
+.chip{flex:1;padding:9px 10px;border-radius:10px;background:var(--accent-l);color:var(--accent-d);font-size:14px;font-weight:600;text-align:center}
+.chip input{border:0;background:transparent;color:inherit;font:inherit;width:100%;text-align:center}
+main{padding:12px;max-width:720px;margin:0 auto}
+.banner{background:#fff6e3;border:1px solid #f1d9a2;color:#6b4e0c;border-radius:12px;padding:10px 12px;margin-bottom:10px;font-size:14px}
+@media (prefers-color-scheme: dark){.banner{background:#3a301a;border-color:#5e4d1e;color:#f0d89a}}
+.banner b{display:block;margin-bottom:2px}
+.row{display:flex;gap:10px;margin-bottom:6px}
+.time{width:52px;flex:none;text-align:right;color:var(--muted);font-size:14px;padding-top:12px;font-variant-numeric:tabular-nums}
+.slot{flex:1;min-height:56px;border-radius:12px;background:var(--slot);border:1px dashed var(--line);padding:10px 12px;text-align:left;display:flex;flex-direction:column;justify-content:center;color:var(--muted);font-size:14px}
+.slot:active{background:var(--accent-l)}
+.slot.busy{background:var(--accent);border:0;color:#fff}
+.slot.busy .n{font-weight:700;font-size:16px}
+.slot.busy .d{opacity:.9;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.slot.past:not(.busy){opacity:.55}
+.slot.now{outline:2px solid var(--warn)}
+.endline{margin-left:62px;color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.card h3{margin:0 0 8px;font-size:16px}
+.li{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;width:100%;text-align:left}
+.li .av{width:38px;height:38px;border-radius:50%;background:var(--accent-l);color:var(--accent-d);display:grid;place-items:center;font-weight:700;flex:none}
+.li .t{flex:1;min-width:0}
+.li .t b{display:block}
+.li .t small{color:var(--muted)}
+input[type=text],input[type=tel],input[type=search],textarea,select,input[type=number]{width:100%;font:inherit;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin-bottom:10px}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px 2px}
+.btn{padding:12px 16px;border-radius:12px;background:var(--accent);color:#fff;font-weight:600}
+.btn.sec{background:var(--accent-l);color:var(--accent-d)}
+.btn.del{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1;min-width:120px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{flex:1;padding:10px 4px 8px;background:none;color:var(--muted);font-size:12px}
+.tabs button span{display:block;font-size:22px;line-height:1.1}
+.tabs button.on{color:var(--accent-d);font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:92dvh;overflow:auto}
+@media (min-width:600px){.modal{align-items:center}.sheet{border-radius:20px}}
+.sheet h2{margin:0 0 12px;font-size:19px}
+.muted{color:var(--muted);font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.hide{display:none}
+.vh{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
+.dlg{z-index:80}
+label.btn{display:block;text-align:center;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:20px;z-index:99;font-size:14px}
+</style>
+</head>
+<body>
+<header id="hdr"></header>
+<main id="main"></main>
+<nav class="tabs">
+  <button data-tab="day" class="on"><span>📅</span>Gün</button>
+  <button data-tab="upcoming"><span>⏰</span>Yaklaşan</button>
+  <button data-tab="clients"><span>👤</span>Danışanlar</button>
+  <button data-tab="settings"><span>⚙️</span>Ayarlar</button>
+</nav>
+<div id="modalHost"></div>
+<div id="dlgHost"></div>
+
+<script>
+"use strict";
+/* ============ Veri katmanı (localStorage) ============ */
+const KEY = "randevu_defteri_v1";
+const START_H = 8, END_H = 22; // 08:00 - 22:00
+let DB = { clients: [], appts: [], settings: { remind: 30, lastBackup: null } };
+let memoryOnly = false;
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      DB = Object.assign({ clients: [], appts: [], settings: {} }, d);
+      DB.settings = Object.assign({ remind: 30, lastBackup: null }, DB.settings);
+    }
+  } catch (e) { memoryOnly = true; }
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(DB)); }
+  catch (e) { memoryOnly = true; toast("Kayıt yapılamadı! Yedek alın."); }
+}
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+/* ============ Yardımcılar ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseIso = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parseIso(s); d.setDate(d.getDate() + n); return iso(d); };
+const DAYS = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+const MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+const longDate = s => { const d = parseIso(s); return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
+const dayName = s => DAYS[parseIso(s).getDay()];
+const hh = h => `${pad(h)}:00`;
+const client = id => DB.clients.find(c => c.id === id);
+const cname = id => { const c = client(id); return c ? `${c.name} ${c.surname}`.trim() : "(silinmiş danışan)"; };
+const apptAt = (date, hour) => DB.appts.find(a => a.date === date && a.hour === hour);
+const apptStart = a => { const d = parseIso(a.date); d.setHours(a.hour, 0, 0, 0); return d; };
+let toastT;
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach(e => e.remove());
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t); clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2400);
+}
+const remindLabel = m => m == 0 ? "Hatırlatma yok" : m < 60 ? `${m} dk önce` : m < 1440 ? `${m / 60} saat önce` : "1 gün önce";
+
+/* ============ Durum ============ */
+let tab = "day";
+let curDate = iso(new Date());
+let clientQuery = "";
+
+/* ============ Görünümler ============ */
+function render() {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+  if (tab === "day") renderDay();
+  else if (tab === "upcoming") renderUpcoming();
+  else if (tab === "clients") renderClients();
+  else renderSettings();
+}
+function setHeader(html) { $("#hdr").innerHTML = html; }
+
+/* ---- Gün ---- */
+function renderDay() {
+  const today = iso(new Date());
+  const d = parseIso(curDate);
+  setHeader(`
+    <div class="nav">
+      <button class="ib" id="prev" aria-label="Önceki gün">‹</button>
+      <div class="title"><b>${dayName(curDate)}</b><small>${longDate(curDate)}${curDate === today ? " · Bugün" : ""}</small></div>
+      <button class="ib" id="next" aria-label="Sonraki gün">›</button>
+    </div>
+    <div class="sub">
+      <button class="chip" id="todayBtn">Bugün</button>
+      <label class="chip" style="margin:0;color:inherit;font-size:14px">📆 Tarih seç <input type="date" id="pick" value="${curDate}" style="position:absolute;opacity:0;width:1px;height:1px"></label>
+    </div>`);
+  const now = new Date();
+  let html = "";
+  const b = upcomingBanner();
+  if (b) html += b;
+  for (let h = START_H; h < END_H; h++) {
+    const a = apptAt(curDate, h);
+    const slotDate = new Date(d); slotDate.setHours(h, 0, 0, 0);
+    const past = slotDate.getTime() + 3600000 <= now.getTime();
+    const isNow = curDate === today && now.getHours() === h;
+    html += `<div class="row"><div class="time">${hh(h)}</div>`;
+    if (a) {
+      html += `<button class="slot busy ${isNow ? "now" : ""}" data-h="${h}"><span class="n">${esc(cname(a.clientId))}</span>${a.note ? `<span class="d">${esc(a.note)}</span>` : ""}</button>`;
+    } else {
+      html += `<button class="slot ${past ? "past" : ""} ${isNow ? "now" : ""}" data-h="${h}">+ Boş</button>`;
+    }
+    html += `</div>`;
+  }
+  html += `<div class="endline">${hh(END_H)} · gün sonu</div>`;
+  $("#main").innerHTML = html;
+  $("#prev").onclick = () => { curDate = addDays(curDate, -1); renderDay(); };
+  $("#next").onclick = () => { curDate = addDays(curDate, 1); renderDay(); };
+  $("#todayBtn").onclick = () => { curDate = iso(new Date()); renderDay(); };
+  $("#pick").onchange = e => { if (e.target.value) { curDate = e.target.value; renderDay(); } };
+  document.querySelectorAll(".slot").forEach(s => s.onclick = () => openAppt(curDate, +s.dataset.h));
+  // kaydırma: bugünse şimdiki saate git
+  if (curDate === today) { const n = document.querySelector(".slot.now"); if (n) n.scrollIntoView({ block: "center" }); }
+}
+function upcomingBanner() {
+  if (curDate !== iso(new Date())) return "";
+  const now = Date.now();
+  const soon = DB.appts.filter(a => { const t = apptStart(a).getTime(); return t > now && t - now <= 3 * 3600000; }).sort((a, b) => apptStart(a) - apptStart(b));
+  if (!soon.length) return "";
+  const a = soon[0], mins = Math.round((apptStart(a) - now) / 60000);
+  return `<div class="banner"><b>⏰ Yaklaşan randevu</b>${esc(cname(a.clientId))} · ${hh(a.hour)} (${mins >= 60 ? Math.floor(mins / 60) + " sa " + (mins % 60) + " dk" : mins + " dk"} sonra)</div>`;
+}
+
+/* ---- Yaklaşan ---- */
+function renderUpcoming() {
+  setHeader(`<div class="nav"><div class="title"><b>Yaklaşan Randevular</b><small>Bugünden itibaren</small></div></div>`);
+  const nowT = Date.now() - 3600000;
+  const list = DB.appts.filter(a => apptStart(a).getTime() >= nowT).sort((a, b) => apptStart(a) - apptStart(b)).slice(0, 60);
+  if (!list.length) { $("#main").innerHTML = `<div class="empty">Yaklaşan randevu yok.</div>`; return; }
+  let html = "", last = "";
+  list.forEach(a => {
+    if (a.date !== last) { html += `<p class="muted" style="margin:14px 4px 6px"><b>${longDate(a.date)} · ${dayName(a.date)}</b></p>`; last = a.date; }
+    html += `<button class="li" data-d="${a.date}" data-h="${a.hour}"><div class="av">${hh(a.hour).slice(0, 2)}</div><div class="t"><b>${esc(cname(a.clientId))}</b><small>${hh(a.hour)}${a.note ? " · " + esc(a.note) : ""}</small></div></button>`;
+  });
+  $("#main").innerHTML = html;
+  document.querySelectorAll(".li").forEach(b => b.onclick = () => { curDate = b.dataset.d; openAppt(b.dataset.d, +b.dataset.h); });
+}
+
+/* ---- Danışanlar ---- */
+function renderClients() {
+  setHeader(`<div class="nav"><div class="title"><b>Danışanlar</b><small>${DB.clients.length} kayıt</small></div><button class="ib" id="addC" aria-label="Yeni danışan">＋</button></div>
+    <div class="sub"><input type="search" id="q" placeholder="Ara…" value="${esc(clientQuery)}" style="margin:0"></div>`);
+  $("#addC").onclick = () => openClient();
+  $("#q").oninput = e => { clientQuery = e.target.value; drawClientList(); };
+  $("#main").innerHTML = `<div id="clist"></div>`;
+  drawClientList();
+}
+function drawClientList() {
+  const q = clientQuery.trim().toLocaleLowerCase("tr");
+  const list = DB.clients.filter(c => `${c.name} ${c.surname} ${c.phone || ""}`.toLocaleLowerCase("tr").includes(q))
+    .sort((a, b) => `${a.name} ${a.surname}`.localeCompare(`${b.name} ${b.surname}`, "tr"));
+  if (!list.length) { $("#clist").innerHTML = `<div class="empty">${DB.clients.length ? "Sonuç yok." : "Henüz danışan kaydı yok. Sağ üstteki ＋ ile ekleyin."}</div>`; return; }
+  $("#clist").innerHTML = list.map(c => {
+    const n = DB.appts.filter(a => a.clientId === c.id).length;
+    return `<button class="li" data-id="${c.id}"><div class="av">${esc((c.name[0] || "?").toLocaleUpperCase("tr"))}</div><div class="t"><b>${esc(c.name)} ${esc(c.surname)}</b><small>${esc(c.phone || "Telefon yok")} · ${n} randevu</small></div></button>`;
+  }).join("");
+  document.querySelectorAll("#clist .li").forEach(b => b.onclick = () => openClient(b.dataset.id));
+}
+
+/* ---- Ayarlar ---- */
+function renderSettings() {
+  setHeader(`<div class="nav"><div class="title"><b>Ayarlar</b><small>Yedek ve hatırlatma</small></div></div>`);
+  const lb = DB.settings.lastBackup ? new Date(DB.settings.lastBackup).toLocaleString("tr-TR") : "Hiç alınmadı";
+  const notifState = ("Notification" in window) ? Notification.permission : "desteklenmiyor";
+  $("#main").innerHTML = `
+    <div class="card"><h3>💾 Yedekleme</h3>
+      <p class="muted">Veriler yalnızca bu cihazın tarayıcısında saklanır. Telefon değiştirirken ya da tarayıcı verisi silinirse kaybolmaması için düzenli yedek alın.</p>
+      <p class="muted">Son yedek: <b>${esc(lb)}</b></p>
+      <div class="btns"><button class="btn" id="exp">Yedek al</button><label class="btn sec" for="file">Yedekten yükle</label></div>
+      <input type="file" id="file" class="vh">
+            <p class="muted">“Yedek al” deyince açılan menüden <b>“Dosyalara Kaydet”</b>i seçin. Geri yüklemek için “Yedekten yükle” ile o dosyayı seçin.</p>
+    </div>
+    <div class="card"><h3>⏰ Hatırlatma</h3>
+      <label>Yeni randevular için varsayılan hatırlatma</label>
+      <select id="defRemind">${[0, 15, 30, 60, 120, 1440].map(m => `<option value="${m}" ${DB.settings.remind == m ? "selected" : ""}>${remindLabel(m)}</option>`).join("")}</select>
+      <p class="muted">Uygulama açıkken bildirim ve üstte uyarı gösterilir. Uygulama kapalıyken de çalan, telefonun kendi hatırlatması için randevuyu açıp <b>“Takvime ekle”</b> deyin: iPhone Takvim’ine alarmla eklenir.</p>
+      <div class="btns"><button class="btn sec" id="notif">Bildirimlere izin ver (${esc(notifState)})</button></div>
+    </div>
+    <div class="card"><h3>ℹ️ Bilgi</h3>
+      <p class="muted">Çalışma saatleri: ${hh(START_H)} – ${hh(END_H)} · Randevu süresi 1 saat.<br>Danışan: ${DB.clients.length} · Randevu: ${DB.appts.length}</p>
+      ${memoryOnly ? `<p style="color:var(--danger)"><b>Uyarı:</b> Tarayıcı kalıcı depolamaya izin vermiyor. Veriler kapanınca silinebilir.</p>` : ""}
+    </div>`;
+  $("#exp").onclick = exportBackup;
+  $("#file").onchange = importBackup;
+  $("#defRemind").onchange = e => { DB.settings.remind = +e.target.value; save(); toast("Kaydedildi"); };
+  $("#notif").onclick = async () => {
+    if (!("Notification" in window)) return toast("Bu tarayıcı bildirimi desteklemiyor");
+    const r = await Notification.requestPermission(); toast("Bildirim: " + r); renderSettings();
+  };
+}
+
+/* ============ Modal ============ */
+function modal(inner) {
+  const host = $("#modalHost");
+  host.innerHTML = `<div class="modal" id="mod"><div class="sheet">${inner}</div></div>`;
+  $("#mod").addEventListener("click", e => { if (e.target.id === "mod") closeModal(); });
+}
+function closeModal() { $("#modalHost").innerHTML = ""; }
+function askConfirm(msg, okLabel = "Evet", danger = true) {
+  return new Promise(res => {
+    const h = $("#dlgHost");
+    h.innerHTML = `<div class="modal dlg" id="dlg"><div class="sheet"><h2 style="font-size:17px;white-space:pre-line">${esc(msg)}</h2>
+      <div class="btns"><button class="btn ${danger ? "del" : ""}" id="dOk">${esc(okLabel)}</button><button class="btn sec" id="dNo">Vazgeç</button></div></div></div>`;
+    const done = v => { h.innerHTML = ""; res(v); };
+    $("#dOk").onclick = () => done(true);
+    $("#dNo").onclick = () => done(false);
+  });
+}
+function askAlert(msg) {
+  return new Promise(res => {
+    const h = $("#dlgHost");
+    h.innerHTML = `<div class="modal dlg" id="dlg"><div class="sheet"><h2 style="font-size:17px;white-space:pre-line">${esc(msg)}</h2>
+      <div class="btns"><button class="btn" id="dOk">Tamam</button></div></div></div>`;
+    $("#dOk").onclick = () => { h.innerHTML = ""; res(); };
+  });
+}
+
+/* ---- Randevu penceresi ---- */
+function openAppt(date, hour) {
+  const a = apptAt(date, hour);
+  const sorted = DB.clients.slice().sort((x, y) => `${x.name} ${x.surname}`.localeCompare(`${y.name} ${y.surname}`, "tr"));
+  const sel = a ? a.clientId : "";
+  const remind = a ? a.remind : DB.settings.remind;
+  modal(`
+    <h2>${a ? "Randevuyu düzenle" : "Yeni randevu"}</h2>
+    <p class="muted" style="margin-top:-6px">${longDate(date)} ${dayName(date)} · ${hh(hour)} – ${hh(hour + 1)}</p>
+    <label>Danışan</label>
+    <select id="cSel">
+      <option value="">— Danışan seçin —</option>
+      ${sorted.map(c => `<option value="${c.id}" ${c.id === sel ? "selected" : ""}>${esc(c.name)} ${esc(c.surname)}</option>`).join("")}
+      <option value="__new">＋ Yeni danışan ekle…</option>
+    </select>
+    <div id="newBox" class="hide">
+      <label>Ad</label><input type="text" id="nName" autocomplete="off">
+      <label>Soyad</label><input type="text" id="nSur" autocomplete="off">
+      <label>Telefon (isteğe bağlı)</label><input type="tel" id="nTel">
+    </div>
+    <label>Açıklama</label>
+    <textarea id="note" placeholder="Seans notu, konu…">${esc(a ? a.note : "")}</textarea>
+    <label>Hatırlatma</label>
+    <select id="rem">${[0, 15, 30, 60, 120, 1440].map(m => `<option value="${m}" ${remind == m ? "selected" : ""}>${remindLabel(m)}</option>`).join("")}</select>
+    <div class="btns">
+      <button class="btn" id="saveA">Kaydet</button>
+      <button class="btn sec" id="cancelA">Vazgeç</button>
+    </div>
+    ${a ? `<div class="btns" style="margin-top:8px"><button class="btn sec" id="ics">📲 Takvime ekle</button><button class="btn del" id="delA">Sil</button></div>` : ""}
+  `);
+  const toggleNew = () => $("#newBox").classList.toggle("hide", $("#cSel").value !== "__new");
+  $("#cSel").onchange = () => { toggleNew(); if ($("#cSel").value === "__new") $("#nName").focus(); };
+  $("#cancelA").onclick = closeModal;
+  $("#saveA").onclick = () => {
+    let cid = $("#cSel").value;
+    if (!cid) return toast("Danışan seçin");
+    if (cid === "__new") {
+      const name = $("#nName").value.trim(), sur = $("#nSur").value.trim();
+      if (!name) return toast("Ad girin");
+      const c = { id: uid(), name, surname: sur, phone: $("#nTel").value.trim(), note: "" };
+      DB.clients.push(c); cid = c.id;
+    }
+    const data = { clientId: cid, note: $("#note").value.trim(), remind: +$("#rem").value, notified: false };
+    if (a) Object.assign(a, data);
+    else DB.appts.push(Object.assign({ id: uid(), date, hour }, data));
+    save(); closeModal(); render(); toast("Randevu kaydedildi");
+  };
+  if (a) {
+    $("#delA").onclick = async () => { if (await askConfirm("Bu randevu silinsin mi?", "Sil")) { DB.appts = DB.appts.filter(x => x.id !== a.id); save(); closeModal(); render(); toast("Randevu silindi"); } };
+    $("#ics").onclick = () => downloadICS(a);
+  }
+}
+
+/* ---- Danışan penceresi ---- */
+function openClient(id) {
+  const c = id ? client(id) : null;
+  const history = c ? DB.appts.filter(a => a.clientId === c.id).sort((x, y) => apptStart(y) - apptStart(x)) : [];
+  modal(`
+    <h2>${c ? "Danışanı düzenle" : "Yeni danışan"}</h2>
+    <label>Ad</label><input type="text" id="cn" value="${esc(c?.name)}" autocomplete="off">
+    <label>Soyad</label><input type="text" id="cs" value="${esc(c?.surname)}" autocomplete="off">
+    <label>Telefon</label><input type="tel" id="cp" value="${esc(c?.phone)}">
+    <label>Not</label><textarea id="cnote">${esc(c?.note)}</textarea>
+    ${c && history.length ? `<p class="muted"><b>Randevu geçmişi</b><br>${history.slice(0, 10).map(a => `${longDate(a.date)} ${hh(a.hour)}`).join("<br>")}${history.length > 10 ? `<br>…ve ${history.length - 10} tane daha` : ""}</p>` : ""}
+    <div class="btns"><button class="btn" id="sc">Kaydet</button><button class="btn sec" id="cc">Vazgeç</button></div>
+    ${c ? `<div class="btns" style="margin-top:8px"><button class="btn del" id="dc">Danışanı sil</button></div>` : ""}
+  `);
+  $("#cc").onclick = closeModal;
+  $("#sc").onclick = () => {
+    const name = $("#cn").value.trim();
+    if (!name) return toast("Ad girin");
+    const d = { name, surname: $("#cs").value.trim(), phone: $("#cp").value.trim(), note: $("#cnote").value.trim() };
+    if (c) Object.assign(c, d); else DB.clients.push(Object.assign({ id: uid() }, d));
+    save(); closeModal(); render(); toast("Kaydedildi");
+  };
+  if (c) $("#dc").onclick = async () => {
+    const n = history.length;
+    if (await askConfirm(`${c.name} ${c.surname} silinsin mi?${n ? `\nBu danışana ait ${n} randevu da silinecek.` : ""}`, "Sil")) {
+      DB.clients = DB.clients.filter(x => x.id !== c.id);
+      DB.appts = DB.appts.filter(a => a.clientId !== c.id);
+      save(); closeModal(); render();
+    }
+  };
+}
+
+/* ============ Yedekleme ============ */
+function download(name, text, type) {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+const backupText = () => JSON.stringify({ app: "randevu-defteri", version: 1, exportedAt: new Date().toISOString(), data: DB }, null, 2);
+function markBackup() { DB.settings.lastBackup = new Date().toISOString(); save(); if (tab === "settings") renderSettings(); }
+
+async function exportBackup() {
+  const text = backupText();
+  const name = `randevu-yedek-${iso(new Date())}.json`;
+  // 0) Artifact ortamı: yerleşik kaydetme (iPhone'da paylaşım menüsü açılır)
+  try {
+    const dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null;
+    if (dl) {
+      try { await dl.save({ filename: name, data: text }); markBackup(); toast("Yedek kaydedildi"); return; }
+      catch (e) { if (e && e.code === "declined") return; }
+    }
+  } catch (e) {}
+  // 1) iPhone paylaşım menüsü: "Dosyalara Kaydet" seçeneği
+  if (navigator.share) {
+    for (const type of ["application/json", "text/plain"]) {
+      try {
+        const file = new File([text], name, { type });
+        if (navigator.canShare && !navigator.canShare({ files: [file] })) continue;
+        await navigator.share({ files: [file], title: "Randevu yedeği" });
+        markBackup(); toast("Yedek kaydedildi"); return;
+      } catch (e) { if (e && e.name === "AbortError") return; }
+    }
+  }
+  // 2) İndirme (octet-stream: tarayıcı JSON'u ekranda açmak yerine dosya olarak indirir)
+  try {
+    const blob = new Blob([text], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    markBackup(); toast("Yedek indirildi (Dosyalar ▸ İndirilenler)");
+  } catch (e) { await askAlert("Yedek kaydedilemedi: " + (e && e.message ? e.message : e)); }
+}
+
+async function restoreFrom(text) {
+  let d;
+  try {
+    let t = String(text).replace(/^[﻿​]+/, "").trim();
+    const a = t.indexOf("{"), b = t.lastIndexOf("}");
+    if (a < 0 || b <= a) throw new Error("JSON bulunamadı");
+    const j = JSON.parse(t.slice(a, b + 1));
+    d = j.data || j;
+    if (!Array.isArray(d.clients)) d.clients = [];
+    if (!Array.isArray(d.appts)) d.appts = [];
+    if (!j.data && !j.clients && !j.appts) throw new Error("danışan/randevu alanı yok");
+  } catch (err) {
+    const head = String(text).slice(0, 60).replace(/\s+/g, " ");
+    await askAlert(`Yedek okunamadı (${err && err.message ? err.message : err}).\nDosya ${String(text).length} karakter, başı: “${head}”`);
+    return false;
+  }
+  const msg = `Yedekte ${d.clients.length} danışan ve ${d.appts.length} randevu var.\nMevcut tüm veriler bununla DEĞİŞTİRİLSİN mi?`;
+  if (!(await askConfirm(msg, "Yükle", false))) return false;
+  DB = {
+    clients: d.clients,
+    appts: d.appts.map(a => Object.assign({}, a, { hour: +a.hour, remind: +a.remind || 0 })),
+    settings: Object.assign({ remind: 30, lastBackup: null }, d.settings)
+  };
+  save(); render(); toast("Yedek yüklendi"); return true;
+}
+async function importBackup(e) {
+  const input = e.target;
+  const f = input.files && input.files[0];
+  if (!f) return;
+  try {
+    const text = f.text ? await f.text() : await new Promise((res, rej) => {
+      const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsText(f);
+    });
+    await restoreFrom(text);
+  } catch (err) {
+    await askAlert("Dosya okunamadı: " + (err && err.message ? err.message : err));
+  }
+  try { input.value = ""; } catch (x) {}
+}
+
+/* ============ Takvime ekle (.ics) ============ */
+function downloadICS(a) {
+  const s = apptStart(a), e = new Date(s.getTime() + 3600000);
+  const f = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Randevu Defteri//TR", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
+    `UID:${a.id}@randevu-defteri`, `DTSTAMP:${f(new Date())}`, `DTSTART:${f(s)}`, `DTEND:${f(e)}`,
+    `SUMMARY:Danışan: ${cname(a.clientId).replace(/[,;]/g, " ")}`,
+    a.note ? `DESCRIPTION:${a.note.replace(/\n/g, "\\n").replace(/[,;]/g, " ")}` : "",
+    a.remind > 0 ? `BEGIN:VALARM\r\nTRIGGER:-PT${a.remind}M\r\nACTION:DISPLAY\r\nDESCRIPTION:Randevu\r\nEND:VALARM` : "",
+    "END:VEVENT", "END:VCALENDAR"
+  ].filter(Boolean).join("\r\n");
+  download(`randevu-${a.date}-${hh(a.hour).replace(":", "")}.ics`, ics, "text/calendar");
+}
+
+/* ============ Uygulama içi hatırlatma ============ */
+function checkReminders() {
+  const now = Date.now(); let changed = false;
+  DB.appts.forEach(a => {
+    if (!a.remind || a.notified) return;
+    const t = apptStart(a).getTime();
+    if (now >= t - a.remind * 60000 && now < t) {
+      a.notified = true; changed = true;
+      const msg = `${cname(a.clientId)} · ${hh(a.hour)}`;
+      toast("⏰ " + msg);
+      try { if ("Notification" in window && Notification.permission === "granted") new Notification("Yaklaşan randevu", { body: msg }); } catch (e) {}
+    }
+  });
+  if (changed) { save(); if (tab === "day") renderDay(); }
+}
+
+/* ============ Başlat ============ */
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0, 0); });
+load();
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+render();
+checkReminders();
+setInterval(checkReminders, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { checkReminders(); if (tab === "day") { /* bugün görünümünü tazele */ if (curDate === iso(new Date())) renderDay(); } } });
+</script>
+</body>
+</html>
+
+</body></html>
