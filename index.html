@@ -76,6 +76,15 @@ label{display:block;font-size:13px;color:var(--muted);margin:0 0 4px 2px}
 .vh{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden}
 .dlg{z-index:80}
 label.btn{display:block;text-align:center;margin:0}
+a.btn{display:block;text-align:center;text-decoration:none}
+.wrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.wrow:last-child{border-bottom:0}
+.wrow .tm{width:46px;flex:none;font-variant-numeric:tabular-nums;color:var(--muted)}
+.wrow .nm{flex:1;min-width:0}
+.wrow .nm b{display:block}
+.wrow .st{font-size:12px;color:var(--muted)}
+.wrow .st.ok{color:var(--accent-d);font-weight:700}
+.wrow a.btn{flex:none;padding:10px 14px;min-width:0}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:20px;z-index:99;font-size:14px}
 </style>
 </head>
@@ -166,6 +175,7 @@ function renderDay() {
     </div>
     <div class="sub">
       <button class="chip" id="todayBtn">Bugün</button>
+      <button class="chip" id="waDay">💬 Hatırlat</button>
       <label class="chip" style="margin:0;color:inherit;font-size:14px">📆 Tarih seç <input type="date" id="pick" value="${curDate}" style="position:absolute;opacity:0;width:1px;height:1px"></label>
     </div>`);
   const now = new Date();
@@ -190,6 +200,7 @@ function renderDay() {
   $("#prev").onclick = () => { curDate = addDays(curDate, -1); renderDay(); };
   $("#next").onclick = () => { curDate = addDays(curDate, 1); renderDay(); };
   $("#todayBtn").onclick = () => { curDate = iso(new Date()); renderDay(); };
+  $("#waDay").onclick = () => openWaList(curDate);
   $("#pick").onchange = e => { if (e.target.value) { curDate = e.target.value; renderDay(); } };
   document.querySelectorAll(".slot").forEach(s => s.onclick = () => openAppt(curDate, +s.dataset.h));
   // kaydırma: bugünse şimdiki saate git
@@ -259,6 +270,11 @@ function renderSettings() {
       <p class="muted">Uygulama açıkken bildirim ve üstte uyarı gösterilir. Uygulama kapalıyken de çalan, telefonun kendi hatırlatması için randevuyu açıp <b>“Takvime ekle”</b> deyin: iPhone Takvim’ine alarmla eklenir.</p>
       <div class="btns"><button class="btn sec" id="notif">Bildirimlere izin ver (${esc(notifState)})</button></div>
     </div>
+    <div class="card"><h3>💬 WhatsApp mesajı</h3>
+      <label>Mesaj metni</label>
+      <textarea id="waTpl" style="min-height:80px">${esc(waTpl())}</textarea>
+      <p class="muted">Kullanılabilir alanlar: {ad} {soyad} {tarih} {saat}. Açıklama notları mesaja hiçbir zaman eklenmez.</p>
+    </div>
     <div class="card"><h3>ℹ️ Bilgi</h3>
       <p class="muted">Çalışma saatleri: ${hh(START_H)} – ${hh(END_H)} · Randevu süresi 1 saat.<br>Danışan: ${DB.clients.length} · Randevu: ${DB.appts.length}</p>
       ${memoryOnly ? `<p style="color:var(--danger)"><b>Uyarı:</b> Tarayıcı kalıcı depolamaya izin vermiyor. Veriler kapanınca silinebilir.</p>` : ""}
@@ -266,6 +282,7 @@ function renderSettings() {
   $("#exp").onclick = exportBackup;
   $("#file").onchange = importBackup;
   $("#defRemind").onchange = e => { DB.settings.remind = +e.target.value; save(); toast("Kaydedildi"); };
+  $("#waTpl").onchange = e => { DB.settings.waTemplate = e.target.value.trim() || DEF_TPL; save(); toast("Kaydedildi"); };
   $("#notif").onclick = async () => {
     if (!("Notification" in window)) return toast("Bu tarayıcı bildirimi desteklemiyor");
     const r = await Notification.requestPermission(); toast("Bildirim: " + r); renderSettings();
@@ -304,6 +321,9 @@ function openAppt(date, hour) {
   const sorted = DB.clients.slice().sort((x, y) => `${x.name} ${x.surname}`.localeCompare(`${y.name} ${y.surname}`, "tr"));
   const sel = a ? a.clientId : "";
   const remind = a ? a.remind : DB.settings.remind;
+  const cl = a ? client(a.clientId) : null;
+  const waHref = a && cl ? waLink(cl, a) : "";
+  const waBtn = waHref ? `<a class="btn sec" id="wa" href="${waHref}" target="_blank" rel="noopener">💬 WhatsApp ile hatırlat${a.waSent ? " ✓" : ""}</a>` : "";
   modal(`
     <h2>${a ? "Randevuyu düzenle" : "Yeni randevu"}</h2>
     <p class="muted" style="margin-top:-6px">${longDate(date)} ${dayName(date)} · ${hh(hour)} – ${hh(hour + 1)}</p>
@@ -326,7 +346,7 @@ function openAppt(date, hour) {
       <button class="btn" id="saveA">Kaydet</button>
       <button class="btn sec" id="cancelA">Vazgeç</button>
     </div>
-    ${a ? `<div class="btns" style="margin-top:8px"><button class="btn sec" id="ics">📲 Takvime ekle</button><button class="btn del" id="delA">Sil</button></div>` : ""}
+    ${a ? `<div class="btns" style="margin-top:8px">${waBtn}<button class="btn sec" id="ics">📲 Takvime ekle</button><button class="btn del" id="delA">Sil</button></div>` : ""}
   `);
   const toggleNew = () => $("#newBox").classList.toggle("hide", $("#cSel").value !== "__new");
   // Danışan seçilince danışan kaydındaki açıklama otomatik gelir (elle yazdığınız metin korunur)
@@ -357,6 +377,7 @@ function openAppt(date, hour) {
   if (a) {
     $("#delA").onclick = async () => { if (await askConfirm("Bu randevu silinsin mi?", "Sil")) { DB.appts = DB.appts.filter(x => x.id !== a.id); save(); closeModal(); render(); toast("Randevu silindi"); } };
     $("#ics").onclick = () => downloadICS(a);
+    const wb = $("#wa"); if (wb) wb.onclick = () => { a.waSent = true; save(); };
   }
 }
 
@@ -474,6 +495,48 @@ async function importBackup(e) {
     await askAlert("Dosya okunamadı: " + (err && err.message ? err.message : err));
   }
   try { input.value = ""; } catch (x) {}
+}
+
+/* ============ WhatsApp hatırlatma (yarı otomatik) ============ */
+const DEF_TPL = "Merhaba {ad} {soyad}, {tarih} saat {saat} randevunuzu hatırlatırım.";
+const waTpl = () => (DB.settings && DB.settings.waTemplate) || DEF_TPL;
+function waNumber(raw) {
+  let d = String(raw || "").replace(/\D/g, "");
+  if (!d) return "";
+  if (d.startsWith("00")) d = d.slice(2);
+  else if (d.length === 11 && d.startsWith("0")) d = "90" + d.slice(1);
+  else if (d.length === 10) d = "90" + d;
+  return d.length >= 11 ? d : "";
+}
+function waLink(c, a) {
+  const num = waNumber(c.phone);
+  if (!num) return "";
+  const msg = waTpl()
+    .replace(/\{ad\}/g, c.name || "").replace(/\{soyad\}/g, c.surname || "")
+    .replace(/\{tarih\}/g, longDate(a.date)).replace(/\{saat\}/g, hh(a.hour))
+    .replace(/\s+/g, " ").replace(/\s+([,.!?])/g, "$1").trim();
+  return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+}
+function openWaList(date) {
+  const list = DB.appts.filter(a => a.date === date).sort((x, y) => x.hour - y.hour);
+  let rows = list.map(a => {
+    const c = client(a.clientId);
+    const href = c ? waLink(c, a) : "";
+    const st = !href ? `<span class="st">Geçerli telefon yok</span>` : `<span class="st ${a.waSent ? "ok" : ""}">${a.waSent ? "✓ Gönderildi" : "Gönderilmedi"}</span>`;
+    return `<div class="wrow" data-id="${a.id}"><div class="tm">${hh(a.hour)}</div><div class="nm"><b>${esc(cname(a.clientId))}</b>${st}</div>${href ? `<a class="btn ${a.waSent ? "sec" : ""}" href="${href}" target="_blank" rel="noopener">${a.waSent ? "Tekrar" : "Gönder"}</a>` : ""}</div>`;
+  }).join("");
+  modal(`<h2>💬 WhatsApp hatırlatma</h2><p class="muted" style="margin-top:-6px">${longDate(date)} ${dayName(date)}</p>
+    ${rows || `<div class="empty">Bu gün randevu yok.</div>`}
+    <p class="muted">Her danışan için “Gönder”e dokunun, WhatsApp hazır mesajla açılır; orada Gönder’e basıp uygulamaya dönün.</p>
+    <div class="btns"><button class="btn sec" id="wClose">Kapat</button></div>`);
+  $("#wClose").onclick = () => { closeModal(); render(); };
+  document.querySelectorAll(".wrow a.btn").forEach(link => link.addEventListener("click", () => {
+    const row = link.closest(".wrow"); const a = DB.appts.find(x => x.id === row.dataset.id);
+    if (!a) return;
+    a.waSent = true; save();
+    const st = row.querySelector(".st"); st.textContent = "✓ Gönderildi"; st.classList.add("ok");
+    link.textContent = "Tekrar"; link.classList.add("sec");
+  }));
 }
 
 /* ============ Takvime ekle (.ics) ============ */
